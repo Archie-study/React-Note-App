@@ -1,72 +1,64 @@
 import React from "react";
 
-class NoteInputForm extends React.Component {
+class NoteInput extends React.Component {
     constructor(props) {
         super(props);
-
-        //inisialisasi state
         this.state = {
             title: '',
-            content: '',
-        }
+            body: '',
+            titleLength: 0,
+        };
 
         this.onTitleChangeEventHandler = this.onTitleChangeEventHandler.bind(this);
-        this.onContentChangeEventHandler = this.onContentChangeEventHandler.bind(this);
+        this.onBodyChangeEventHandler = this.onBodyChangeEventHandler.bind(this);
         this.onSubmitEventHandler = this.onSubmitEventHandler.bind(this);
     }
 
-    // Untuk Title
     onTitleChangeEventHandler(event) {
+        if (event.target.value.length <= 50) {
+            this.setState((prevState) => {
+                return {
+                    title: event.target.value,
+                    titleLength: (event.target.value).length,
+                }
+            });
+        }
+    }
+
+    onBodyChangeEventHandler(event) {
         this.setState(() => {
             return {
-                title: event.target.value,
+                body: event.target.value,
             }
         });
     }
 
-    //Untuk Content
-    onContentChangeEventHandler(event) {
-        this.setState(() => {
-            return {
-                content: event.target.value,
-            }
-        });
-    }
-
-    //Untuk Tombol Submit
-    onSubmitEventHandler(event){
+    onSubmitEventHandler(event) {
         event.preventDefault();
-        this.props.addNewNote(this.state);
+        this.props.addNote(this.state);
     }
-
-
-
-    //
-
-
-
 
     render() {
         return (
             <div className="note-input">
-                <h2>Buat Catatan</h2>
+                <h2>Buat catatan</h2>
                 <form onSubmit={this.onSubmitEventHandler}>
-                    <p className="note-input__title__char-limit"></p>
+                    <p className="note-input__title__char-limit">Sisa Karakter: {50 - this.state.titleLength}</p>
                     <input 
-                        type="text" 
-                        className="note-input__title" 
+                        className='note-input__title' 
+                        type='text' 
+                        required='' 
                         placeholder="Ini adalah judul ..." 
                         value={this.state.title} 
                         onChange={this.onTitleChangeEventHandler} 
-                        required 
                     />
                     <textarea 
                         className="note-input__body" 
                         type="text" 
                         placeholder="Tuliskan catatanmu di sini ..." 
-                        value={this.state.content}
-                        onChange={this.onContentChangeEventHandler}
-                        required></textarea>
+                        value={this.state.body} 
+                        onChange={this.onBodyChangeEventHandler} 
+                    />
                     <button type="submit">Buat</button>
                 </form>
             </div>
@@ -74,4 +66,4 @@ class NoteInputForm extends React.Component {
     }
 }
 
-export default NoteInputForm;
+export default NoteInput;

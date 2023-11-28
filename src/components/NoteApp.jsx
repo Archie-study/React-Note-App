@@ -1,29 +1,34 @@
 import React from "react";
-import NoteList from "./Body/NoteList";
 import { getInitialData } from "../utils";
-import NoteInputForm from "./Body/NoteInputForm";
+import NoteAppBody from "./Body/NoteAppBody";
+import NoteAppHeader from "./Head/NoteAppHeader";
 
 class NoteApp extends React.Component {
-    constructor(props) {
+     constructor(props) {
         super(props);
         this.state = {
             notes: getInitialData(),
-        }
-
+            titleSearch: '',
+        };
+        
         this.onDeleteHandler = this.onDeleteHandler.bind(this);
-        this.onAddNewNoteHandler = this.onAddNewNoteHandler.bind(this);
+        this.onArchiveHandler = this.onArchiveHandler.bind(this);
+        this.onAddNoteHandler = this.onAddNoteHandler.bind(this);
+        this.onSearchHandler = this.onSearchHandler.bind(this);
     }
 
-
-    // Method Delete Handler
     onDeleteHandler(id) {
         const notes = this.state.notes.filter(note => note.id !== id);
         this.setState({ notes });
     }
 
+    onArchiveHandler(id) {
+        const notes = this.state.notes.map((note) => note.id === id ? { ...note, archived: !note.archived } : note);
+        this.setState({ notes });
 
-    //Method Add New Note Handler
-    onAddNewNoteHandler({ title, content }){
+    }
+
+    onAddNoteHandler({ title, body }) {
         this.setState((prevState) => {
             return {
                 notes: [
@@ -31,65 +36,44 @@ class NoteApp extends React.Component {
                     {
                         id: +new Date(),
                         title,
-                        content,
+                        body,
+                        createdAt: new Date(),
+                        archived: false,
                     }
                 ]
+
             }
         });
     }
 
+    onSearchHandler(event) {
+        this.setState(() => {
+            return {
+                titleSearch: event.target.value,
+            }
+        });
+    }
 
-    // Rendering
-    render(){
+    render() {
         return (
-            <div className="note-app__body">
-                <NoteInputForm 
-                    addNewNote={this.onAddNewNoteHandler} />
-                <h2>Catatan Aktif</h2>
-                <NoteList 
-                    notes={this.state.notes} 
-                    onDelete={this.onDeleteHandler} />
+            <div className='note-app'>
+                <NoteAppHeader name="Notes" onSearch={this.onSearchHandler} />
+                <NoteAppBody 
+                    notes={this.state.notes.filter(
+                        (note) => note.archived === false
+                    )
+                    .filter((note) => note.title.toLowerCase()
+                    .includes(this.state.titleSearch.toLowerCase()))
+                    } 
+                    archived={this.state.notes.filter(
+                        (note) => note.archived === true)
+                    } 
+                    onDelete={this.onDeleteHandler} 
+                    onArchive={this.onArchiveHandler} 
+                    onAdd={this.onAddNoteHandler} />
             </div>
         )
     }
 }
 
 export default NoteApp;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from "react";
-// import NoteList from "./Body/NoteList";
-// import { getInitialData } from "../utils";
-
-// function NoteApp(){
-//     const notes = getInitialData();
-
-//     return (
-//         <div className="note-app__body">
-//             <h2>Catatan Aktif</h2>
-//             <NoteList notes={notes} />
-//         </div>
-//     )
-// }
-
-// export default NoteApp;
